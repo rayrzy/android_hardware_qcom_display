@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2019, The Linux Foundataion. All rights reserved.
+/* Copyright (c) 2015 - 2021, The Linux Foundataion. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are
@@ -185,7 +185,6 @@ struct PPFeatureVersion {
 struct PPHWAttributes : HWResourceInfo, HWPanelInfo, DisplayConfigVariableInfo {
   char panel_name[256] = "generic_panel";
   PPFeatureVersion version;
-  int panel_max_brightness = 0;
 
   void Set(const HWResourceInfo &hw_res, const HWPanelInfo &panel_info,
            const DisplayConfigVariableInfo &attr, const PPFeatureVersion &feature_ver);
@@ -396,8 +395,10 @@ class SDEPADitherWrapper : private SDEPADitherData {
  public:
   static SDEPADitherWrapper *Init(uint32_t arg __attribute__((__unused__)));
   ~SDEPADitherWrapper() {
-    if (buffer_)
+    if (buffer_) {
       delete[] buffer_;
+      buffer_ = nullptr;
+    }
   }
   inline SDEPADitherData *GetConfig(void) { return this; }
 
@@ -436,6 +437,10 @@ struct SDEPaData {
   uint32_t six_zone_len = 0;
   uint32_t *six_zone_curve_p0 = NULL;
   uint32_t *six_zone_curve_p1 = NULL;
+  ~SDEPaData() {
+    six_zone_curve_p0 = nullptr;
+    six_zone_curve_p1 = nullptr;
+  }
 };
 
 struct SDEIgcLUTData {
@@ -486,8 +491,10 @@ class SDEGamutCfgWrapper : private SDEGamutCfg {
 
   // Data consumer<Commit thread> will be responsible to destroy it once the feature is commited.
   ~SDEGamutCfgWrapper() {
-    if (buffer_)
+    if (buffer_) {
       delete[] buffer_;
+      buffer_ = nullptr;
+    }
   }
 
   // Data consumer will use this method to retrieve contained feature configuration.
@@ -502,8 +509,10 @@ class SDEPaCfgWrapper : private SDEPaData {
  public:
   static SDEPaCfgWrapper *Init(uint32_t arg = 0);
   ~SDEPaCfgWrapper() {
-    if (buffer_)
+    if (buffer_) {
       delete[] buffer_;
+      buffer_ = nullptr;
+    }
   }
   inline SDEPaData *GetConfig(void) { return this; }
 
@@ -516,8 +525,10 @@ class SDEIgcLUTWrapper : private SDEIgcLUTData {
  public:
   static SDEIgcLUTWrapper *Init(uint32_t arg __attribute__((__unused__)));
   ~SDEIgcLUTWrapper() {
-    if (buffer_)
+    if (buffer_) {
       delete[] buffer_;
+      buffer_ = nullptr;
+    }
   }
   inline SDEIgcLUTData *GetConfig(void) { return this; }
 
@@ -530,8 +541,10 @@ class SDEIgcV30LUTWrapper : private SDEIgcV30LUTData {
  public:
   static SDEIgcV30LUTWrapper *Init(uint32_t arg __attribute__((__unused__)));
   ~SDEIgcV30LUTWrapper() {
-    if (buffer_)
+    if (buffer_) {
       delete[] buffer_;
+      buffer_ = nullptr;
+    }
   }
   inline SDEIgcV30LUTData *GetConfig(void) { return this; }
 
@@ -547,8 +560,10 @@ class SDEPgcLUTWrapper : private SDEPgcLUTData {
  public:
   static SDEPgcLUTWrapper *Init(uint32_t arg __attribute__((__unused__)));
   ~SDEPgcLUTWrapper() {
-    if (buffer_)
+    if (buffer_) {
       delete[] buffer_;
+      buffer_ = nullptr;
+    }
   }
   inline SDEPgcLUTData *GetConfig(void) { return this; }
 
@@ -565,8 +580,10 @@ template <typename T>
 class TPPFeatureInfo : public PPFeatureInfo {
  public:
   virtual ~TPPFeatureInfo() {
-    if (params_)
+    if (params_) {
       delete params_;
+      params_ = nullptr;
+    }
   }
 
   // API for data consumer to get underlying data configs to program into pp hardware block.
